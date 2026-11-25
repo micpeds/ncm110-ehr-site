@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CareChart Faculty Console</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/ehr.css?v=7304e17-mwvwgg4s">
+  <link rel="stylesheet" href="css/instructor.css?v=7304e17-mwvwgg4s">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2313294b'/%3E%3Cpath d='M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z' fill='%23f5b400'/%3E%3C/svg%3E">
+</head>
+<body class="inst">
+
+<!-- ============ SIGN IN ============ -->
+<div id="iLogin" class="login fac-login" hidden>
+  <div class="login-brand fac-brand">
+    <div class="brand-mark lg fac-mark"><svg viewBox="0 0 32 32"><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z"/></svg></div>
+    <div class="fac-kicker">CareChart EHR</div>
+    <h1>Faculty <span>Console</span></h1>
+    <p>Set up the lab, build patient cases and grade your students' documentation.</p>
+    <ul class="fac-feats">
+      <li><b>My Sections</b><span>Assign a patient to each section, unlock Task 5 and close submissions.</span></li>
+      <li><b>Patient Cases</b><span>Build your own patients and problems, with a private answer key.</span></li>
+      <li><b>Submissions</b><span>Watch groups chart live, then grade with the rubric and release scores.</span></li>
+    </ul>
+    <small class="brand-foot">NCM 110 Nursing Informatics · For educational use only.</small>
+  </div>
+  <div class="login-panel">
+    <form id="iLoginForm" class="login-form" autocomplete="on" novalidate>
+      <div class="fac-badge">Faculty &amp; administrators</div>
+      <h2>Sign in</h2>
+      <p class="muted">Use the account your administrator created for you.</p>
+      <div id="iNotice" class="notice" hidden></div>
+      <label for="iUser">Username
+        <input class="f" id="iUser" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="e.g., mreyes"></label>
+      <label for="iPw">Password
+        <span class="pw-wrap"><input class="f" type="password" id="iPw" name="password" autocomplete="current-password" placeholder="Your password">
+          <button type="button" class="pw-toggle" id="iPwToggle" aria-label="Show password" aria-pressed="false">Show</button></span>
+        <small class="caps" id="iCaps" hidden><svg class="ico sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l7 8h-4v5H9v-5H5zM9 20h6"/></svg> Caps Lock is on</small></label>
+      <div id="iErr" class="form-err" role="alert"></div>
+      <button class="btn primary lg block" type="submit" id="iLoginBtn"><span class="spin" aria-hidden="true"></span><span class="btn-lbl">Sign in</span></button>
+      <p class="tiny muted help-line">Forgot your password? Ask your administrator to reset it from the Admin page.</p>
+      <div id="iDemo" class="demo-box" hidden>
+        <div class="demo-head"><b>Demo mode</b><span>Data stays in this browser. Pick an account to fill it in:</span></div>
+        <div class="demo-accts">
+          <button type="button" data-u="admin" data-p="admin123"><b>Administrator</b><small>admin</small></button>
+          <button type="button" data-u="mreyes" data-p="demo123"><b>Prof. M. Reyes</b><small>BSN3A, BSN3B</small></button>
+          <button type="button" data-u="jcruz" data-p="demo123"><b>Prof. J. Cruz</b><small>BSN3C</small></button>
+        </div>
+      </div>
+      <p class="tiny faculty-link"><a href="index.html"><svg class="ico sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Student sign-in</a></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="iApp" class="app" hidden>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark"><svg viewBox="0 0 32 32"><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z"/></svg></div><b>CareChart</b><span class="env inst-env">FACULTY</span></div>
+    <nav class="top-tabs" id="mainNav" aria-label="Faculty sections">
+      <button data-view="subs">Submissions</button>
+      <button data-view="sections">My Sections</button>
+      <button data-view="cases">Patient Cases</button>
+      <button data-view="admin" id="navAdmin" hidden>Admin</button>
+    </nav>
+    <div class="top-mid" id="crumbs"></div>
+    <div class="top-right">
+      <button class="btn ghost sm on-dark" id="backBtn" hidden><svg class="ico sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> All submissions</button>
+      <div class="acct">
+        <button class="acct-btn" id="acctBtn"><span class="avatar sm" id="acctAv">?</span><span id="acctName"></span><span class="caret">▾</span></button>
+        <div class="acct-menu" id="acctMenu" hidden>
+          <div class="acct-who"><b id="acctFull"></b><small id="acctRole"></small></div>
+          <button id="pwBtn">Change password</button>
+          <button id="iLogout">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUBMISSIONS -->
+  <main class="i-main" id="view-subs" hidden>
+    <div class="view">
+      <div class="pg-head"><div><div class="crumb">Your sections</div><h1>Submissions</h1><p class="pg-desc">Charts from the sections you handle, with live progress. Open a chart to review it exactly as the students see it and complete the rubric.</p></div>
+        <div class="head-side"><span class="live"><span class="live-dot"></span><span id="liveTxt">Live</span></span><button class="btn sm" id="exportBtn">Export grades (CSV)</button><button class="btn sm" id="refreshBtn">Refresh</button></div></div>
+      <div class="stats" id="stats"></div>
+      <div class="analytics" id="analytics"></div>
+      <section class="card flush">
+        <div class="tbl-toolbar">
+          <select class="f" id="fSection"><option value="">All my sections</option></select>
+          <input class="f search" id="q" placeholder="Search group or student name…">
+          <div class="seg" id="fStatus"><button class="on" data-v="">All</button><button data-v="draft">In progress</button><button data-v="submitted">Submitted</button><button data-v="graded">Graded</button></div>
+        </div>
+        <div class="tbl-wrap"><table class="tbl sub-tbl"><thead><tr><th>Group</th><th style="width:150px">Status</th><th style="width:190px">Progress</th><th style="width:130px">Last activity</th><th style="width:130px">Score</th><th style="width:90px"></th></tr></thead><tbody id="subRows"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MY SECTIONS -->
+  <main class="i-main" id="view-sections" hidden>
+    <div class="view">
+      <div class="pg-head"><div><div class="crumb">Class setup</div><h1>My Sections</h1><p class="pg-desc">Set how many groups each section has, choose the patient case they chart, and control Task 5 and the submission deadline. Sections are created by the administrator.</p></div></div>
+      <div class="sec-grid" id="secGrid"></div>
+    </div>
+  </main>
+
+  <!-- PATIENT CASES -->
+  <main class="i-main" id="view-cases" hidden>
+    <div class="view">
+      <div class="pg-head"><div><div class="crumb">Case library</div><h1>Patient Cases</h1><p class="pg-desc">Build your own patients and problems. Your cases are private to you. Start from the built-in sample or a blank case, then assign a case to a section under <b>My Sections</b>.</p></div>
+        <div class="head-side"><button class="btn sm" id="newBlank">+ Blank case</button><button class="btn sm primary" id="newFromSample">+ New from sample</button></div></div>
+      <div class="case-grid" id="caseGrid"></div>
+    </div>
+  </main>
+  <div class="editor-view" id="view-editor" hidden></div>
+
+  <!-- ADMIN -->
+  <main class="i-main" id="view-admin" hidden>
+    <div class="view">
+      <div class="pg-head"><div><div class="crumb">Administrator</div><h1>Accounts &amp; Sections</h1><p class="pg-desc">Create instructor accounts and decide which sections each instructor handles. Each instructor then sets the number of groups and assigns a patient case under My Sections.</p></div></div>
+      <section class="card flush">
+        <div class="sec-bar"><b>Instructors</b><span id="instCount"></span><button class="btn sm primary" id="addInst" style="margin-left:auto">+ Add instructor</button></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Username</th><th style="width:110px">Role</th><th>Sections</th><th style="width:100px">Status</th><th style="width:360px"></th></tr></thead><tbody id="instRows"></tbody></table></div>
+      </section>
+      <section class="card flush">
+        <div class="sec-bar"><b>Sections</b><span id="secCount"></span><button class="btn sm primary" id="addSec" style="margin-left:auto">+ Add section</button></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:120px">Section</th><th>Instructor</th><th style="width:90px">Groups</th><th>Patient case</th><th style="width:90px">Charts</th><th style="width:170px"></th></tr></thead><tbody id="secRows"></tbody></table></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- REVIEW -->
+  <div class="review" id="reviewView" hidden>
+    <div class="review-ehr">
+      <div class="banner" id="rBanner"></div>
+      <div class="ehr" id="rEhr"><nav class="ehr-nav"></nav><main class="ehr-main"></main></div>
+    </div>
+    <aside class="grade-panel" id="gradePanel"></aside>
+  </div>
+</div>
+
+<!-- case preview (student view, nothing is saved) -->
+<div class="preview-wrap" id="preview" hidden>
+  <div class="preview-bar"><span class="pill amber">Preview</span><b id="pvTitle"></b><span class="muted small">This is what students see. Nothing you type here is saved.</span><button class="btn sm" id="pvClose">Close preview</button></div>
+  <div class="banner" id="pvBanner"></div>
+  <div class="ehr" id="pvEhr"><nav class="ehr-nav"></nav><main class="ehr-main"></main></div>
+</div>
+
+<!-- generic form modal -->
+<div class="modal" id="formModal" hidden>
+  <form class="modal-box" id="fmForm">
+    <div class="modal-head"><h2 id="fmTitle"></h2><button type="button" class="icon-btn" data-close aria-label="Close"><svg class="ico sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="fmBody" class="fm-body"></div>
+    <div class="form-err" id="fmErr"></div>
+    <div class="modal-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn primary" type="submit" id="fmSubmit">Save</button></div>
+  </form>
+</div>
+
+<div class="modal" id="trailModal" hidden>
+  <div class="modal-box wide">
+    <div class="modal-head"><h2>Audit trail</h2><button class="icon-btn" data-close aria-label="Close"><svg class="ico sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="muted small">Every field change, with the user who was logged in and the time — like a hospital EHR access log.</p>
+    <div class="trail-wrap"><table class="tbl compact"><thead><tr><th>Time</th><th>User</th><th>Screen</th><th>Field</th></tr></thead><tbody id="trailRows"></tbody></table></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="js/config.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/core.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/case-data.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/ehr-visuals.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/api.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/ehr.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/case-editor.js?v=7304e17-mwvwgg4s"></script>
+<script src="js/instructor.js?v=7304e17-mwvwgg4s"></script>
+</body>
+</html>
